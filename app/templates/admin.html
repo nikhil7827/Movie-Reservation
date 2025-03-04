@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+    <h2>Admin Dashboard</h2>
+
+    <h3>All Reservations</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Movie</th>
+                <th>Showtime</th>
+                <th>Seats</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in all_reservations %}
+                <tr>
+                    <td>{{ reservation.id }}</td>
+                    <td>{{ reservation.user.username }}</td>
+                    <td>{{ reservation.showtime.movie.title }}</td>
+                    <td>{{ reservation.showtime.showtime.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ reservation.seat_count }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Manage Users</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>
+                        {% if user.role != 'admin' %}
+                            <form method="POST" action="{{ url_for('auth.promote_to_admin', user_id=user.id) }}" class="d-inline">
+                                <button type="submit" class="btn btn-warning btn-sm">Promote to Admin</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
