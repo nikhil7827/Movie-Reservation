@@ -5,34 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="adad4925-96ae-44a8-b57b-978918526292" name="Changes" comment="add">
-      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/models/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/models/movie.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/models/reservation.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/models/showtime.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/models/user.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/auth.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/movie.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/routes/reservation.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/static/css/style.css.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/admin.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/base.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/login.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/movies.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/reservations.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/showtimes.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/templates/signup.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/utils/security.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/instance/users.db" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/home.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes/auth_routes.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes/movie_routes.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes/reservation_routes.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -156,7 +131,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741031253703</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="add">
+      <option name="closed" value="true" />
+      <created>1741047202713</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1741047202713</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">

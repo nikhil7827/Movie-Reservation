@@ -71,13 +71,13 @@ def register():
         db.session.commit()
         flash('Account created! You can now login.', 'success')
         return redirect(url_for('login'))
-    return render_template('register.html', form=form)
+    return render_template('signup.html', form=form)
 
 
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html', user=current_user)
+    return render_template('movies.html', user=current_user)
 
 
 @app.route('/logout')
