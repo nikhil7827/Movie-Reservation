@@ -6,6 +6,35 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length
 
+from flask import render_template
+from app import create_app
+from flask_login import current_user
+import os
+
+# Initialize the Flask app
+app = create_app()
+
+# Debug: Print template folder and available templates
+print("Template folder:", app.template_folder)
+print("Available templates:", app.jinja_env.list_templates())
+
+
+# Define the home route
+@app.route('/')
+def home():
+    """
+    Render the home page of the Movie Reservation Service.
+    Passes the current_user object to the template for personalized content.
+    """
+    # Additional debug output when route is hit
+    print("Attempting to render 'home.html'")
+    print("Current working directory:", os.getcwd())
+    return render_template('home.html', user=current_user)
+
+
+# Run the application
+if __name__ == '__main__':
+    app.run(debug=True, host='127.0.0.1', port=5000)
 # Initialize Flask app
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
@@ -71,7 +100,7 @@ def register():
         db.session.commit()
         flash('Account created! You can now login.', 'success')
         return redirect(url_for('login'))
-    return render_template('signup.html', form=form)
+    return render_template('base.html', form=form)
 
 
 @app.route('/dashboard')
