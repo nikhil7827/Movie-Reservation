@@ -1,45 +1,44 @@
 {% extends "base.html" %}
-{% block title %}Movies{% endblock %}
 {% block content %}
-    <h2>Movies</h2>
-    <div class="row">
-        {% for movie in movies %}
-            <div class="col-md-4 mb-3">
-                <div class="card">
-                    {% if movie.poster_url %}
-                        <img src="{{ movie.poster_url }}" class="card-img-top" alt="{{ movie.title }}">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">{{ movie.title }}</h5>
-                        <p class="card-text">{{ movie.description }}</p>
-                        <p><strong>Genre:</strong> {{ movie.genre }}</p>
-                        <a href="{{ url_for('reservation.showtimes', movie_id=movie.id) }}" class="btn btn-primary">View Showtimes</a>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
+  <h1>Movies</h1>
 
-    {% if current_user.is_authenticated and current_user.role == 'admin' %}
-        <h3 class="mt-4">Add New Movie</h3>
-        <form method="POST" action="{{ url_for('movie.add_movie') }}" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control" id="title" name="title" required>
-            </div>
-            <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <textarea class="form-control" id="description" name="description" required></textarea>
-            </div>
-            <div class="mb-3">
-                <label for="genre" class="form-label">Genre</label>
-                <input type="text" class="form-control" id="genre" name="genre" required>
-            </div>
-            <div class="mb-3">
-                <label for="poster" class="form-label">Poster Image</label>
-                <input type="file" class="form-control" id="poster" name="poster">
-            </div>
-            <button type="submit" class="btn btn-success">Add Movie</button>
-        </form>
+  <!-- Display flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
     {% endif %}
+  {% endwith %}
+
+  <!-- List of movies -->
+  <ul>
+    {% for movie in movies %}
+      <li>{{ movie.title }} ({{ movie.genre }}) - {{ movie.description }}</li>
+    {% endfor %}
+  </ul>
+
+  <!-- Add movie form (visible to admins only) -->
+  {% if current_user.is_authenticated and current_user.role == 'admin' %}
+    <h2>Add a New Movie</h2>
+    <form method="POST" action="{{ url_for('movie.add_movie') }}">
+      <div>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+      </div>
+      <div>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+      </div>
+      <div>
+        <label for="genre">Genre:</label>
+        <input type="text" id="genre" name="genre" required>
+      </div>
+      <div>
+        <label for="poster_url">Poster URL (optional):</label>
+        <input type="url" id="poster_url" name="poster_url">
+      </div>
+      <button type="submit">Add Movie</button>
+    </form>
+  {% endif %}
 {% endblock %}
