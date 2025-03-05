@@ -1,12 +1,14 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
+from flask import Flask
+from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate  # Add this import
 
 # Initialize extensions globally (but without an app yet)
 db = SQLAlchemy()
 login_manager = LoginManager()
+migrate = Migrate()  # Initialize Migrate
 
 def create_app():
     # Create the Flask app instance
@@ -24,6 +26,7 @@ def create_app():
     # Initialize extensions with the app
     db.init_app(app)
     login_manager.init_app(app)
+    migrate.init_app(app, db)  # Initialize migrate with app and db
     login_manager.login_view = 'auth.login'
 
     # Define user loader for Flask-Login
@@ -52,3 +55,8 @@ def seed_initial_data():
         admin.set_password('admin123')  # Change this in production
         db.session.add(admin)
         db.session.commit()
+
+# If you want to run the app directly
+if __name__ == '__main__':
+    app = create_app()
+    app.run(debug=True)
