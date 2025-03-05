@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>{{ movie.title }}</h1>
+  <div class="movie-info">
+    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" width="300">
+    <p>{{ movie.description }}</p>
+    <p><strong>Genre:</strong> {{ movie.genre }}</p>
+    <p><strong>Ticket Price per Seat:</strong> ${{ movie.ticket_price }}</p>
+  </div>
+
+  <h2>Select Seats</h2>
+  <form id="seatForm">
+    <div class="seat-grid">
+      {% for row in seats %}
+        <div class="seat-row">
+          {% for seat in row %}
+            <input type="checkbox" id="{{ seat }}" name="seats" value="{{ seat }}">
+            <label for="{{ seat }}">{{ seat }}</label>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+    <p>Total Price: $<span id="totalPrice">0.00</span></p>
+  </form>
+
+  <script>
+    const ticketPrice = {{ movie.ticket_price }};
+    const form = document.getElementById('seatForm');
+    const totalPriceSpan = document.getElementById('totalPrice');
+    form.addEventListener('change', () => {
+      const selectedSeats = form.querySelectorAll('input[name="seats"]:checked').length;
+      totalPriceSpan.textContent = (selectedSeats * ticketPrice).toFixed(2);
+    });
+  </script>
+{% endblock %}
+
+<style>
+  .seat-grid { display: grid; gap: 10px; }
+  .seat-row { display: flex; gap: 10px; }
+</style>

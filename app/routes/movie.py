@@ -38,3 +38,11 @@ def add_movie():
         flash(f'Error adding movie: {str(e)}', 'error')
 
     return redirect(url_for('movie.get_movies'))
+
+
+@bp.route('/movie/<int:movie_id>', methods=['GET'])
+def movie_detail(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+    # Simple 5x5 seat grid for demo (could be per showtime/hall in a real app)
+    seats = [[f'{row}{col}' for col in range(1, 6)] for row in 'ABCDE']
+    return render_template('movie_detail.html', movie=movie, seats=seats)
