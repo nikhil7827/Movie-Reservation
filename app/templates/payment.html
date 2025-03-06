@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Payment for {{ movie.title }}</h1>
+  <div class="booking-summary">
+    <h3>Booking Summary</h3>
+    <p><strong>Movie:</strong> {{ movie.title }}</p>
+    <p><strong>Selected Seats:</strong> {{ selected_seats | join(', ') }}</p>
+    <p><strong>Total Price:</strong> ${{ total_price }}</p>
+  </div>
+  <div class="payment-form">
+    <h3>Payment Information</h3>
+    <p><em>Payment processing is not implemented in this demo.</em></p>
+    <form method="POST" action="#">
+      <label>Card Number: <input type="text" placeholder="1234 5678 9012 3456" disabled></label><br>
+      <label>Expiry Date: <input type="text" placeholder="MM/YY" disabled></label><br>
+      <label>CVV: <input type="text" placeholder="123" disabled></label><br>
+      <button type="submit" class="btn btn-primary" disabled>Pay Now</button>
+    </form>
+  </div>
+  <a href="{{ url_for('movie.movie_detail', movie_id=movie.id) }}" class="btn btn-secondary">Back to Movie</a>
+{% endblock %}
+
+<style>
+  .booking-summary, .payment-form { margin-bottom: 20px; }
+  label { display: block; margin: 10px 0 5px; }
+  input { padding: 5px; width: 200px; }
+</style>

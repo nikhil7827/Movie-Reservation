@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Add a New Movie</h1>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  <form method="POST" action="{{ url_for('movie.add_movie') }}">
+    <label>Title: <input type="text" name="title" required></label><br>
+    <label>Description: <textarea name="description" required></textarea></label><br>
+    <label>Genre: <input type="text" name="genre" required></label><br>
+    <label>Poster URL (optional): <input type="url" name="poster_url"></label><br>
+    <label>Ticket Price: <input type="number" step="0.01" name="ticket_price" value="10.00" required></label><br>
+    <button type="submit" class="btn">Add Movie</button>
+  </form>
+  <a href="{{ url_for('movie.view_movies') }}" class="btn">Back to Movies</a>
+{% endblock %}
+
+<style>
+  .btn { padding: 10px 20px; background: #007bff; color: white; text-decoration: none; margin: 5px; }
+  .btn:hover { background: #0056b3; }
+  label { display: block; margin: 10px 0 5px; }
+  input, textarea { width: 300px; padding: 5px; }
+</style>

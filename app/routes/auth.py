@@ -23,13 +23,16 @@ def signup():
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        data = request.form
-        user = User.query.filter_by(username=data['username']).first()
-        if user and user.check_password(data['password']):
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.filter_by(username=username).first()
+        if user and user.check_password(password):
             login_user(user)
-            flash('Logged in successfully!')
-            return redirect(url_for('movie.get_movies'))
-        flash('Invalid credentials')
+            flash('Logged in successfully!', 'success')
+            if user.role == 'admin':
+                return redirect(url_for('movie.view_movies'))
+            return redirect(url_for('home'))
+        flash('Invalid username or password.', 'error')
     return render_template('login.html')
 
 @bp.route('/logout', methods=['POST'])

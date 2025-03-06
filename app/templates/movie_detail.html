@@ -2,14 +2,14 @@
 {% block content %}
   <h1>{{ movie.title }}</h1>
   <div class="movie-info">
-    <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" width="300">
+    <img src="{{ movie.poster_url or 'https://via.placeholder.com/300' }}" alt="{{ movie.title }}" width="300">
     <p>{{ movie.description }}</p>
     <p><strong>Genre:</strong> {{ movie.genre }}</p>
     <p><strong>Ticket Price per Seat:</strong> ${{ movie.ticket_price }}</p>
   </div>
 
   <h2>Select Seats</h2>
-  <form id="seatForm">
+  <form id="seatForm" method="POST" action="{{ url_for('movie.payment', movie_id=movie.id) }}">
     <div class="seat-grid">
       {% for row in seats %}
         <div class="seat-row">
@@ -21,6 +21,7 @@
       {% endfor %}
     </div>
     <p>Total Price: $<span id="totalPrice">0.00</span></p>
+    <button type="submit" class="btn btn-success">Book Now</button>
   </form>
 
   <script>
