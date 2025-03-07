@@ -5,13 +5,11 @@ from app.models.movie import Movie
 
 bp = Blueprint('movie', __name__)
 
-
 # Home page
 @bp.route('/')
 def home():
     movies = Movie.query.all()
     return render_template('home.html', movies=movies)
-
 
 # View all movies (admin)
 @bp.route('/movies')
@@ -23,7 +21,6 @@ def view_movies():
     movies = Movie.query.all()
     return render_template('view_movies.html', movies=movies)
 
-
 # Show add movie form
 @bp.route('/add_movie', methods=['GET'])
 @login_required
@@ -32,7 +29,6 @@ def show_add_movie():
         flash('Permission denied.', 'error')
         return redirect(url_for('home'))
     return render_template('add_movie.html')
-
 
 # Handle movie addition (POST)
 @bp.route('/add_movie', methods=['POST'])
@@ -56,17 +52,16 @@ def add_movie():
     except Exception as e:
         db.session.rollback()
         flash(f'Error: {str(e)}', 'error')
-    return redirect(url_for('view_movies'))
-
+    return redirect(url_for('movie.view_movies'))  # Updated endpoint
 
 # Movie detail with seat selection
 @bp.route('/movie/<int:movie_id>', methods=['GET'])
 def movie_detail(movie_id):
     movie = Movie.query.get_or_404(movie_id)
-    seats = [[f'{row}{col}' for col in range(1, 6)] for row in 'ABCDE']  # Simple 5x5 seat grid
+    seats = [[f'{row}{col}' for col in range(1, 6)] for row in 'ABCDE']
     return render_template('movie_detail.html', movie=movie, seats=seats)
 
-#Delete movie (admin)
+# Delete movie (admin)
 @bp.route('/delete_movie/<int:movie_id>', methods=['POST'])
 @login_required
 def delete_movie(movie_id):
@@ -81,14 +76,14 @@ def delete_movie(movie_id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error deleting movie: {str(e)}', 'error')
-    return redirect(url_for('view_movies'))
+    return redirect(url_for('movie.view_movies'))  # Updated endpoint
 
 # Payment page
 @bp.route('/payment/<int:movie_id>', methods=['POST'])
 @login_required
 def payment(movie_id):
     movie = Movie.query.get_or_404(movie_id)
-    selected_seats = request.form.getlist('seats')  # Get list of selected seats
+    selected_seats = request.form.getlist('seats')
     if not selected_seats:
         flash('Please select at least one seat to proceed.', 'error')
         return redirect(url_for('movie.movie_detail', movie_id=movie.id))
