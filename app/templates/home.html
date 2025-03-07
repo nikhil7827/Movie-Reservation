@@ -11,9 +11,6 @@
       </div>
     {% endfor %}
   </div>
-  {% if current_user.is_authenticated and current_user.role == 'admin' %}
-    <a href="{{ url_for('movie.show_add_movie') }}" class="btn btn-primary">Add Movie</a>
-  {% endif %}
 {% endblock %}
 
 <style>

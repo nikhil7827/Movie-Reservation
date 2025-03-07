@@ -10,53 +10,39 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('home') }}">Movie Reservation</a> <!-- Changed to home -->
+            <a class="navbar-brand" href="{{ url_for('home') }}">Movie Reservation</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <!-- Home button -->
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('home') }}">Home</a>
                     </li>
-
                     {% if current_user.is_authenticated %}
-                        <!-- Movies button -->
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('movie.view_movies') }}">Movies</a>
                         </li>
-
-                        <!-- Add Movie button -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('movie.show_add_movie') }}">Add Movie</a>
-                        </li>
-
-                        <!-- My Reservations -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('reservation.get_user_reservations') }}">My Reservations</a>
-                        </li>
-
-                        <!-- Admin Dashboard (for admins only) -->
                         {% if current_user.role == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('movie.show_add_movie') }}">Add Movie</a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ url_for('reservation.admin_dashboard') }}">Admin Dashboard</a>
                             </li>
                         {% endif %}
-
-                        <!-- Logout -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('reservation.get_user_reservations') }}">My Reservations</a>
+                        </li>
                         <li class="nav-item">
                             <form method="POST" action="{{ url_for('auth.logout') }}" style="display:inline;">
                                 <button type="submit" class="nav-link btn btn-link">Logout</button>
                             </form>
                         </li>
                     {% else %}
-                        <!-- Login -->
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
                         </li>
-
-                        <!-- Signup -->
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('auth.signup') }}">Signup</a>
                         </li>

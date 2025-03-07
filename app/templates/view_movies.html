@@ -10,14 +10,12 @@
   {% endwith %}
   <ul>
     {% for movie in movies %}
-      <li>{{ movie.title }} ({{ movie.genre }}) - ${{ movie.ticket_price }}</li>
+      <li>
+        {{ movie.title }} ({{ movie.genre }}) - ${{ movie.ticket_price }}
+        <form action="{{ url_for('movie.delete_movie', movie_id=movie.id) }}" method="POST" style="display:inline;">
+          <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete {{ movie.title }}?');">Delete</button>
+        </form>
+      </li>
     {% endfor %}
   </ul>
-  <a href="{{ url_for('movie.show_add_movie') }}" class="btn">Add Movie</a>
-  <a href="{{ url_for('movie.home') }}" class="btn">Back to Home</a>
 {% endblock %}
-
-<style>
-  .btn { padding: 10px 20px; background: #007bff; color: white; text-decoration: none; margin: 5px; }
-  .btn:hover { background: #0056b3; }
-</style>
