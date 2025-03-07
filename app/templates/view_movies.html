@@ -29,10 +29,13 @@
             <div class="card-body">
               <h5 class="card-title">{{ movie.title }} ({{ movie.genre }})</h5>
               <p class="card-text"><strong>Price:</strong> ${{ movie.ticket_price }}</p>
-              <form action="{{ url_for('movie.delete_movie', movie_id=movie.id) }}" method="POST" style="display: inline;"
-                    onsubmit="return confirm('Are you sure you want to delete {{ movie.title }}?');">
-                <button type="submit" class="btn btn-danger btn-sm delete-btn">Delete</button>
-              </form>
+              <div class="d-flex justify-content-center gap-2">
+                <a href="{{ url_for('movie.edit_movie', movie_id=movie.id) }}" class="btn btn-warning btn-sm edit-btn">Edit</a>
+                <form action="{{ url_for('movie.delete_movie', movie_id=movie.id) }}" method="POST" style="display: inline;"
+                      onsubmit="return confirm('Are you sure you want to delete {{ movie.title }}?');">
+                  <button type="submit" class="btn btn-danger btn-sm delete-btn">Delete</button>
+                </form>
+              </div>
             </div>
           </div>
         </div>
@@ -73,8 +76,12 @@
     transform: scale(1.02);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   }
-  .delete-btn {
+  .edit-btn, .delete-btn {
     transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  .edit-btn:hover {
+    background-color: #e0a800;
+    transform: scale(1.1);
   }
   .delete-btn:hover {
     background-color: #c82333;

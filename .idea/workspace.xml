@@ -5,11 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="adad4925-96ae-44a8-b57b-978918526292" name="Changes" comment="add">
+      <change afterPath="$PROJECT_DIR$/app/templates/edit_movie.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routes/movie.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes/movie.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/add_movie.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/add_movie.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/templates/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/movie_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/movie_detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/payment.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/payment.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/templates/view_movies.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/view_movies.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -258,7 +258,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741358652703</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="add">
+      <option name="closed" value="true" />
+      <created>1741366113943</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1741366113945</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

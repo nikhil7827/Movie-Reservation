@@ -2,7 +2,7 @@
 {% block content %}
   <!-- Header Section -->
   <div class="header-section" style="background: linear-gradient(to right, #1a1a1a, #4b0082); color: white; padding: 60px 20px; text-align: center; position: relative;">
-    <h1 class="display-4">Add a New Movie</h1>
+    <h1 class="display-4">Edit Movie</h1>
     <div class="header-overlay"></div>
   </div>
 
@@ -20,34 +20,34 @@
       {% endif %}
     {% endwith %}
 
-    <!-- Add Movie Form -->
+    <!-- Edit Movie Form -->
     <div class="row justify-content-center">
       <div class="col-lg-6 col-md-8">
         <div class="card shadow-lg p-4 form-card">
-          <h3 class="text-center mb-4">Movie Details</h3>
-          <form method="POST" action="{{ url_for('movie.add_movie') }}" novalidate>
+          <h3 class="text-center mb-4">Edit {{ movie.title }}</h3>
+          <form method="POST" action="{{ url_for('movie.edit_movie', movie_id=movie.id) }}" novalidate>
             <div class="mb-3">
               <label for="title" class="form-label">Title</label>
-              <input type="text" class="form-control" id="title" name="title" required>
+              <input type="text" class="form-control" id="title" name="title" value="{{ movie.title }}" required>
             </div>
             <div class="mb-3">
               <label for="description" class="form-label">Description</label>
-              <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+              <textarea class="form-control" id="description" name="description" rows="3" required>{{ movie.description }}</textarea>
             </div>
             <div class="mb-3">
               <label for="genre" class="form-label">Genre</label>
-              <input type="text" class="form-control" id="genre" name="genre" required>
+              <input type="text" class="form-control" id="genre" name="genre" value="{{ movie.genre }}" required>
             </div>
             <div class="mb-3">
               <label for="poster_url" class="form-label">Poster URL (optional)</label>
-              <input type="text" class="form-control" id="poster_url" name="poster_url">
+              <input type="text" class="form-control" id="poster_url" name="poster_url" value="{{ movie.poster_url or '' }}">
             </div>
             <div class="mb-3">
               <label for="ticket_price" class="form-label">Ticket Price</label>
-              <input type="number" step="0.01" class="form-control" id="ticket_price" name="ticket_price" value="10.00" required>
+              <input type="number" step="0.01" class="form-control" id="ticket_price" name="ticket_price" value="{{ movie.ticket_price }}" required>
             </div>
             <div class="text-center mt-4">
-              <button type="submit" class="btn btn-primary btn-lg add-btn">Add Movie</button>
+              <button type="submit" class="btn btn-primary btn-lg add-btn">Save Changes</button>
               <a href="{{ url_for('movie.view_movies') }}" class="btn btn-secondary btn-lg mt-2">Back to Movies</a>
             </div>
           </form>
