@@ -1,27 +1,111 @@
 {% extends "base.html" %}
 {% block content %}
-  <h1>Payment for {{ movie.title }}</h1>
-  <div class="booking-summary">
-    <h3>Booking Summary</h3>
-    <p><strong>Movie:</strong> {{ movie.title }}</p>
-    <p><strong>Selected Seats:</strong> {{ selected_seats | join(', ') }}</p>
-    <p><strong>Total Price:</strong> ${{ total_price }}</p>
+  <!-- Header Section -->
+  <div class="header-section" style="background: linear-gradient(to right, #1a1a1a, #4b0082); color: white; padding: 60px 20px; text-align: center; position: relative;">
+    <h1 class="display-4">Payment for {{ movie.title }}</h1>
+    <div class="header-overlay"></div>
   </div>
-  <div class="payment-form">
-    <h3>Payment Information</h3>
-    <p><em>Payment processing is not implemented in this demo.</em></p>
-    <form method="POST" action="#">
-      <label>Card Number: <input type="text" placeholder="1234 5678 9012 3456" disabled></label><br>
-      <label>Expiry Date: <input type="text" placeholder="MM/YY" disabled></label><br>
-      <label>CVV: <input type="text" placeholder="123" disabled></label><br>
-      <button type="submit" class="btn btn-primary" disabled>Pay Now</button>
-    </form>
+
+  <!-- Main Content -->
+  <div class="container mt-5">
+    <div class="row">
+      <!-- Booking Summary Card -->
+      <div class="col-lg-4 col-md-5 mb-4">
+        <div class="card h-100 shadow-lg booking-summary-card">
+          <div class="card-body text-center">
+            <h5 class="card-title">Booking Summary</h5>
+            <p class="card-text"><strong>Movie:</strong> {{ movie.title }}</p>
+            <p class="card-text"><strong>Selected Seats:</strong> {{ selected_seats | join(', ') }}</p>
+            <p class="card-text"><strong>Total Price:</strong> ${{ total_price }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Form Card -->
+      <div class="col-lg-8 col-md-7">
+        <div class="card shadow-lg p-4 payment-form-card">
+          <h3 class="text-center mb-4">Payment Information</h3>
+          <p class="text-muted text-center mb-4">Payment processing is not implemented in this demo.</p>
+          <form method="POST" action="{{ url_for('movie.payment', movie_id=movie.id) }}" novalidate>
+            <div class="mb-3">
+              <label for="cardNumber" class="form-label">Card Number</label>
+              <input type="text" class="form-control" id="cardNumber" name="cardNumber" value="1234 5678 9012 3456" readonly>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="expiryDate" class="form-label">Expiry Date (MM/YY)</label>
+                <input type="text" class="form-control" id="expiryDate" name="expiryDate" value="MM/YY" readonly>
+              </div>
+              <div class="col-md-6">
+                <label for="cvv" class="form-label">CVV</label>
+                <input type="text" class="form-control" id="cvv" name="cvv" value="123" readonly>
+              </div>
+            </div>
+            <div class="text-center mt-4">
+              <button type="submit" class="btn btn-primary btn-lg pay-btn" disabled>Pay Now</button>
+              <a href="{{ url_for('movie.movie_detail', movie_id=movie.id) }}" class="btn btn-secondary btn-lg mt-2">Back to Movie</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
-  <a href="{{ url_for('movie.movie_detail', movie_id=movie.id) }}" class="btn btn-secondary">Back to Movie</a>
 {% endblock %}
 
+{% block styles %}
 <style>
-  .booking-summary, .payment-form { margin-bottom: 20px; }
-  label { display: block; margin: 10px 0 5px; }
-  input { padding: 5px; width: 200px; }
+  .header-section {
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
+    z-index: 0;
+  }
+  .header-section h1 {
+    position: relative;
+    z-index: 1;
+  }
+  .booking-summary-card, .payment-form-card {
+    transition: transform 0.3s ease;
+    border: none;
+    background: #ffffff;
+  }
+  .booking-summary-card:hover, .payment-form-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  }
+  .pay-btn {
+    background-color: #4b0082;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+  .pay-btn:hover {
+    background-color: #370062;
+  }
+  .form-control {
+    border-radius: 10px;
+    border: 2px solid #ddd;
+    padding: 10px;
+  }
+  .form-control:focus {
+    border-color: #4b0082;
+    box-shadow: 0 0 5px rgba(75, 0, 130, 0.5);
+  }
+  @media (max-width: 768px) {
+    .col-lg-4, .col-lg-8 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
 </style>
+{% endblock %}

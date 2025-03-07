@@ -1,20 +1,68 @@
 {% extends "base.html" %}
 {% block content %}
-  <h1>Movie Listings</h1>
-  <div class="movie-grid">
-    {% for movie in movies %}
-      <div class="movie-item">
-        <a href="{{ url_for('movie.movie_detail', movie_id=movie.id) }}">
-          <img src="{{ movie.poster_url or 'https://via.placeholder.com/150' }}" alt="{{ movie.title }}" width="150">
-          <p>{{ movie.title }}</p>
-        </a>
-      </div>
-    {% endfor %}
+  <!-- Hero Section -->
+  <div class="hero-section" style="background: linear-gradient(to right, #1a1a1a, #4b0082); color: white; padding: 60px 20px; text-align: center;">
+    <h1>Welcome to Movie Reservation</h1>
+    <p class="lead">Explore the latest movies and book your tickets now!</p>
+  </div>
+
+  <!-- Movie Listings -->
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Movie Listings</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      {% for movie in movies %}
+        <div class="col">
+          <div class="card h-100 shadow-sm movie-card">
+            <img src="{{ movie.poster_url or 'https://via.placeholder.com/300x450' }}" class="card-img-top" alt="{{ movie.title }}" style="object-fit: cover; height: 300px;">
+            <div class="card-body">
+              <h5 class="card-title">{{ movie.title }}</h5>
+              <p class="card-text"><strong>Genre:</strong> {{ movie.genre }}</p>
+              <p class="card-text"><strong>Price:</strong> ${{ movie.ticket_price }}</p>
+              <a href="{{ url_for('movie.movie_detail', movie_id=movie.id) }}" class="btn btn-primary w-100">Book Now</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
   </div>
 {% endblock %}
 
+{% block styles %}
 <style>
-  .movie-grid { display: flex; flex-wrap: wrap; gap: 20px; }
-  .movie-item { text-align: center; }
-  .movie-item img { max-width: 100%; height: auto; }
+  .hero-section {
+    background-size: cover;
+    background-position: center;
+  }
+  .movie-card {
+    transition: transform 0.2s;
+  }
+  .movie-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  .card-img-top {
+    border-bottom: 2px solid #4b0082;
+  }
+  @media (max-width: 768px) {
+    .row-cols-md-3 {
+      row-cols-2;
+    }
+  }
+  @media (max-width: 576px) {
+    .row-cols-md-3 {
+      row-cols-1;
+    }
+  }
 </style>
+{% endblock %}

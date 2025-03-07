@@ -1,21 +1,93 @@
 {% extends "base.html" %}
 {% block content %}
-  <h1>Movies</h1>
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">{{ message }}</div>
+  <!-- Header Section -->
+  <div class="header-section" style="background: linear-gradient(to right, #1a1a1a, #4b0082); color: white; padding: 60px 20px; text-align: center; position: relative;">
+    <h1 class="display-4">Movie Management</h1>
+    <div class="header-overlay"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mt-5">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ 'success' if category == 'success' else 'info' }} alert-dismissible fade show mb-4" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Movie List -->
+    <h2 class="text-center mb-4">Movies</h2>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      {% for movie in movies %}
+        <div class="col">
+          <div class="card h-100 shadow-lg movie-card">
+            <div class="card-body">
+              <h5 class="card-title">{{ movie.title }} ({{ movie.genre }})</h5>
+              <p class="card-text"><strong>Price:</strong> ${{ movie.ticket_price }}</p>
+              <form action="{{ url_for('movie.delete_movie', movie_id=movie.id) }}" method="POST" style="display: inline;"
+                    onsubmit="return confirm('Are you sure you want to delete {{ movie.title }}?');">
+                <button type="submit" class="btn btn-danger btn-sm delete-btn">Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
       {% endfor %}
-    {% endif %}
-  {% endwith %}
-  <ul>
-    {% for movie in movies %}
-      <li>
-        {{ movie.title }} ({{ movie.genre }}) - ${{ movie.ticket_price }}
-        <form action="{{ url_for('movie.delete_movie', movie_id=movie.id) }}" method="POST" style="display:inline;">
-          <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete {{ movie.title }}?');">Delete</button>
-        </form>
-      </li>
-    {% endfor %}
-  </ul>
+    </div>
+  </div>
+{% endblock %}
+
+{% block styles %}
+<style>
+  .header-section {
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
+    z-index: 0;
+  }
+  .header-section h1 {
+    position: relative;
+    z-index: 1;
+  }
+  .movie-card {
+    transition: transform 0.3s ease;
+    border: none;
+    background: #f8f9fa;
+  }
+  .movie-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+  .delete-btn {
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  .delete-btn:hover {
+    background-color: #c82333;
+    transform: scale(1.1);
+  }
+  .alert {
+    border-radius: 10px;
+    padding: 15px;
+  }
+  @media (max-width: 768px) {
+    .row-cols-md-2, .row-cols-lg-3 {
+      row-cols-1;
+    }
+  }
+</style>
 {% endblock %}

@@ -8,7 +8,14 @@ bp = Blueprint('movie', __name__)
 # Home page
 @bp.route('/')
 def home():
-    movies = Movie.query.all()
+    # Fetch unique movies by title
+    all_movies = Movie.query.all()
+    seen_titles = set()
+    movies = []
+    for movie in all_movies:
+        if movie.title not in seen_titles:
+            seen_titles.add(movie.title)
+            movies.append(movie)
     return render_template('home.html', movies=movies)
 
 # View all movies (admin)
@@ -38,6 +45,10 @@ def add_movie():
         flash('Permission denied.', 'error')
         return redirect(url_for('home'))
     data = request.form
+    existing_movie = Movie.query.filter_by(title=data['title']).first()
+    if existing_movie:
+        flash('A movie with this title already exists.', 'error')
+        return redirect(url_for('movie.show_add_movie'))
     new_movie = Movie(
         title=data['title'],
         description=data['description'],
@@ -52,7 +63,7 @@ def add_movie():
     except Exception as e:
         db.session.rollback()
         flash(f'Error: {str(e)}', 'error')
-    return redirect(url_for('movie.view_movies'))  # Updated endpoint
+    return redirect(url_for('movie.view_movies'))
 
 # Movie detail with seat selection
 @bp.route('/movie/<int:movie_id>', methods=['GET'])
@@ -76,7 +87,7 @@ def delete_movie(movie_id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error deleting movie: {str(e)}', 'error')
-    return redirect(url_for('movie.view_movies'))  # Updated endpoint
+    return redirect(url_for('movie.view_movies'))
 
 # Payment page
 @bp.route('/payment/<int:movie_id>', methods=['POST'])

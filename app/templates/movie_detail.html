@@ -1,41 +1,160 @@
 {% extends "base.html" %}
 {% block content %}
-  <h1>{{ movie.title }}</h1>
-  <div class="movie-info">
-    <img src="{{ movie.poster_url or 'https://via.placeholder.com/300' }}" alt="{{ movie.title }}" width="300">
-    <p>{{ movie.description }}</p>
-    <p><strong>Genre:</strong> {{ movie.genre }}</p>
-    <p><strong>Ticket Price per Seat:</strong> ${{ movie.ticket_price }}</p>
+  <!-- Banner Section -->
+  <div class="banner-section" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ movie.poster_url or 'https://via.placeholder.com/1200x400' }}'); background-size: cover; background-position: center; color: white; padding: 100px 20px; text-align: center; position: relative;">
+    <h1 class="display-4">{{ movie.title }}</h1>
+    <p class="lead">{{ movie.description }}</p>
+    <div class="banner-overlay"></div>
   </div>
 
-  <h2>Select Seats</h2>
-  <form id="seatForm" method="POST" action="{{ url_for('movie.payment', movie_id=movie.id) }}">
-    <div class="seat-grid">
-      {% for row in seats %}
-        <div class="seat-row">
-          {% for seat in row %}
-            <input type="checkbox" id="{{ seat }}" name="seats" value="{{ seat }}">
-            <label for="{{ seat }}">{{ seat }}</label>
-          {% endfor %}
+  <!-- Movie Details and Seat Selection -->
+  <div class="container mt-5">
+    <div class="row">
+      <!-- Movie Info Card -->
+      <div class="col-lg-4 col-md-5 mb-4">
+        <div class="card h-100 shadow-lg movie-info-card">
+          <img src="{{ movie.poster_url or 'https://via.placeholder.com/300x450' }}" class="card-img-top" alt="{{ movie.title }}" style="object-fit: cover; height: 300px;">
+          <div class="card-body text-center">
+            <h5 class="card-title">{{ movie.title }}</h5>
+            <p class="card-text"><strong>Genre:</strong> {{ movie.genre }}</p>
+            <p class="card-text"><strong>Ticket Price per Seat:</strong> ${{ movie.ticket_price }}</p>
+          </div>
         </div>
-      {% endfor %}
-    </div>
-    <p>Total Price: $<span id="totalPrice">0.00</span></p>
-    <button type="submit" class="btn btn-success">Book Now</button>
-  </form>
+      </div>
 
-  <script>
-    const ticketPrice = {{ movie.ticket_price }};
-    const form = document.getElementById('seatForm');
-    const totalPriceSpan = document.getElementById('totalPrice');
-    form.addEventListener('change', () => {
-      const selectedSeats = form.querySelectorAll('input[name="seats"]:checked').length;
-      totalPriceSpan.textContent = (selectedSeats * ticketPrice).toFixed(2);
-    });
-  </script>
+      <!-- Seat Selection -->
+      <div class="col-lg-8 col-md-7">
+        <div class="card shadow-lg p-4 seat-selection-card">
+          <h3 class="text-center mb-4">Select Your Seats</h3>
+          <form id="seatForm" method="POST" action="{{ url_for('movie.payment', movie_id=movie.id) }}">
+            <div class="seat-container">
+              <div class="screen-label text-center mb-3">Screen</div>
+              <div class="seat-grid">
+                {% for row in seats %}
+                  <div class="seat-row">
+                    {% for seat in row %}
+                      <input type="checkbox" id="{{ seat }}" name="seats" value="{{ seat }}">
+                      <label for="{{ seat }}" class="seat-label">{{ seat }}</label>
+                    {% endfor %}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="mt-4 text-center">
+              <p><strong>Total Price:</strong> $<span id="totalPrice">0.00</span></p>
+              <button type="submit" class="btn btn-success btn-lg">Book Now</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
+{% block styles %}
 <style>
-  .seat-grid { display: grid; gap: 10px; }
-  .seat-row { display: flex; gap: 10px; }
+  .banner-section {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
+    z-index: 0;
+  }
+  .banner-section h1, .banner-section p {
+    position: relative;
+    z-index: 1;
+  }
+  .movie-info-card {
+    transition: transform 0.3s ease;
+    border: none;
+    background: #f8f9fa;
+  }
+  .movie-info-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  }
+  .seat-selection-card {
+    background: #fff;
+    border-radius: 10px;
+  }
+  .seat-container {
+    position: relative;
+    padding-bottom: 20px;
+  }
+  .seat-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px 0;
+  }
+  .seat-row {
+    display: contents;
+  }
+  .seat-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background-color: #e0e0e0;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    color: #333;
+  }
+  .seat-label:hover {
+    background-color: #d0d0d0;
+    border-color: #bbb;
+  }
+  input[type="checkbox"]:checked + .seat-label {
+    background-color: #28a745;
+    color: white;
+    border-color: #218838;
+  }
+  input[type="checkbox"] {
+    display: none;
+  }
+  .screen-label {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+  @media (max-width: 768px) {
+    .col-lg-4, .col-lg-8 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+    .seat-grid {
+      max-width: 300px;
+    }
+  }
 </style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const ticketPrice = {{ movie.ticket_price }};
+  const form = document.getElementById('seatForm');
+  const totalPriceSpan = document.getElementById('totalPrice');
+  form.addEventListener('change', () => {
+    const selectedSeats = form.querySelectorAll('input[name="seats"]:checked').length;
+    totalPriceSpan.textContent = (selectedSeats * ticketPrice).toFixed(2);
+  });
+</script>
+{% endblock %}
