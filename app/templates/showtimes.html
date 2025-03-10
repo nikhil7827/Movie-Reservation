@@ -1,41 +1,111 @@
 {% extends "base.html" %}
-{% block title %}Showtimes - {{ movie.title }}{% endblock %}
 {% block content %}
-    <h2>Showtimes for {{ movie.title }}</h2>
-    <ul class="list-group">
-        {% for showtime in showtimes %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    {{ showtime.showtime.strftime('%Y-%m-%d %H:%M') }}<br>
-                    <small>Available Seats: {{ showtime.total_seats - showtime.reserved_seats }}</small>
-                </div>
-                {% if current_user.is_authenticated %}
-                    <form method="POST" action="{{ url_for('reservation.reserve_seat', showtime_id=showtime.id) }}" class="d-inline">
-                        <input type="number" name="seat_count" min="1" max="{{ showtime.total_seats - showtime.reserved_seats }}" value="1" class="form-control d-inline w-auto">
-                        <button type="submit" class="btn btn-primary btn-sm">Reserve</button>
-                    </form>
-                {% endif %}
-                {% if current_user.is_authenticated and current_user.role == 'admin' %}
-                    <form method="POST" action="{{ url_for('movie.delete_showtime', showtime_id=showtime.id) }}" class="d-inline">
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                    </form>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
+  <!-- Header Section -->
+  <div class="header-section" style="background: linear-gradient(to right, #1a1a1a, #4b0082); color: white; padding: 60px 20px; text-align: center; position: relative;">
+    <h1 class="display-4">Manage Showtimes for {{ movie.title }}</h1>
+    <div class="header-overlay"></div>
+  </div>
 
-    {% if current_user.is_authenticated and current_user.role == 'admin' %}
-        <h3 class="mt-4">Add Showtime</h3>
-        <form method="POST" action="{{ url_for('movie.add_showtime', movie_id=movie.id) }}">
+  <!-- Main Content -->
+  <div class="container mt-5">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show mb-4" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Showtimes Form -->
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8">
+        <div class="card shadow-lg p-4 form-card">
+          <h3 class="text-center mb-4">Edit Showtimes</h3>
+          <form method="POST" action="{{ url_for('movie.manage_showtimes', movie_id=movie.id) }}" novalidate>
             <div class="mb-3">
-                <label for="showtime" class="form-label">Showtime (YYYY-MM-DD HH:MM)</label>
-                <input type="datetime-local" class="form-control" id="showtime" name="showtime" required>
+              <label for="showtimes" class="form-label">Showtimes (e.g., 10:00 AM, 2:00 PM, 6:00 PM)</label>
+              <textarea class="form-control" id="showtimes" name="showtimes" rows="3" required>{{ movie.showtimes or '' }}</textarea>
             </div>
-            <div class="mb-3">
-                <label for="total_seats" class="form-label">Total Seats</label>
-                <input type="number" class="form-control" id="total_seats" name="total_seats" value="100" required>
+            <div class="text-center mt-4">
+              <button type="submit" class="btn btn-primary btn-lg save-btn">Save Showtimes</button>
+              <a href="{{ url_for('movie.view_movies') }}" class="btn btn-secondary btn-lg mt-2">Back to Movies</a>
             </div>
-            <button type="submit" class="btn btn-success">Add Showtime</button>
-        </form>
-    {% endif %}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block styles %}
+<style>
+  .header-section {
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
+    z-index: 0;
+  }
+  .header-section h1 {
+    position: relative;
+    z-index: 1;
+  }
+  .form-card {
+    transition: transform 0.3s ease;
+    border: none;
+    background: #ffffff;
+  }
+  .form-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  }
+  .form-control {
+    border-radius: 10px;
+    border: 2px solid #ddd;
+    padding: 10px;
+  }
+  .form-control:focus {
+    border-color: #4b0082;
+    box-shadow: 0 0 5px rgba(75, 0, 130, 0.5);
+  }
+  .save-btn {
+    background-color: #4b0082;
+    border: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  .save-btn:hover {
+    background-color: #370062;
+    transform: scale(1.05);
+  }
+  .btn-secondary {
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  .btn-secondary:hover {
+    transform: scale(1.05);
+  }
+  .alert {
+    border-radius: 10px;
+    padding: 15px;
+  }
+  @media (max-width: 768px) {
+    .col-lg-6 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
+</style>
 {% endblock %}

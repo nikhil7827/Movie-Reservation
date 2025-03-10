@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
   <!-- Header Section -->
-  <div class="header-section" style="background: linear-gradient(to right, #1a1a1a, #4b0082); color: white; padding: 40px 20px; text-align: center; position: relative;">
+  <div class="header-section" style="background: linear-gradient(to right, #1a1a1a, #4b0082); color: white; padding: 60px 20px; text-align: center; position: relative;">
     <h1 class="display-4">Welcome to Movie Reservation</h1>
     <p class="lead">Explore the latest movies and book your tickets now!</p>
     <div class="header-overlay"></div>
@@ -13,12 +13,17 @@
     <div class="row row-cols-1 row-cols-md-3 g-4">
       {% for movie in movies %}
         <div class="col">
-          <div class="card h-75 shadow-lg movie-card">
-            <img src="{{ movie.poster_url or 'https://via.placeholder.com/300x450' }}" class="card-img-top" alt="{{ movie.title }}" style="object-fit: cover; height: 200px;">
+          <div class="card h-100 shadow-lg movie-card">
+            <img src="{{ movie.poster_url or 'https://via.placeholder.com/300x450' }}" class="card-img-top" alt="{{ movie.title }}" style="object-fit: cover; height: 300px;">
             <div class="card-body text-center">
               <h5 class="card-title">{{ movie.title }}</h5>
               <p class="card-text"><strong>Genre:</strong> {{ movie.genre }}</p>
               <p class="card-text"><strong>Price:</strong> ${{ movie.ticket_price }}</p>
+              {% if movie.showtimes %}
+                <p class="card-text"><strong>Showtimes:</strong> {{ movie.showtimes }}</p>
+              {% else %}
+                <p class="card-text"><em>No showtimes available</em></p>
+              {% endif %}
               <a href="{{ url_for('movie.movie_detail', movie_id=movie.id) }}" class="btn btn-primary book-btn">Book Now</a>
             </div>
           </div>

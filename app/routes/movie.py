@@ -5,7 +5,6 @@ from app.models.movie import Movie
 
 bp = Blueprint('movie', __name__)
 
-# Existing routes...
 @bp.route('/')
 def home():
     all_movies = Movie.query.all()
@@ -50,7 +49,8 @@ def add_movie():
         description=data['description'],
         genre=data['genre'],
         poster_url=data.get('poster_url', ''),
-        ticket_price=float(data.get('ticket_price', 10.00))
+        ticket_price=float(data.get('ticket_price', 10.00)),
+        showtimes=data.get('showtimes', '')
     )
     try:
         db.session.add(new_movie)
@@ -94,7 +94,6 @@ def payment(movie_id):
     total_price = len(selected_seats) * movie.ticket_price
     return render_template('payment.html', movie=movie, selected_seats=selected_seats, total_price=total_price)
 
-# New route for editing a movie
 @bp.route('/edit_movie/<int:movie_id>', methods=['GET', 'POST'])
 @login_required
 def edit_movie(movie_id):
@@ -108,6 +107,7 @@ def edit_movie(movie_id):
         movie.genre = request.form['genre']
         movie.poster_url = request.form.get('poster_url', '')
         movie.ticket_price = float(request.form.get('ticket_price', 10.00))
+        movie.showtimes = request.form.get('showtimes', '')
         try:
             db.session.commit()
             flash('Movie updated successfully!', 'success')
@@ -116,3 +116,25 @@ def edit_movie(movie_id):
             db.session.rollback()
             flash(f'Error updating movie: {str(e)}', 'error')
     return render_template('edit_movie.html', movie=movie)
+
+@bp.route('/showtimes/<int:movie_id>', methods=['GET', 'POST'])
+@login_required
+def manage_showtimes(movie_id):
+    if current_user.role != 'admin':
+        flash('Permission denied.', 'error')
+        return redirect(url_for('home'))
+    movie = Movie.query.get_or_404(movie_id)
+    if request.method == 'POST':
+        showtimes = request.form.get('showtimes', '').strip()
+        if showtimes:
+            movie.showtimes = showtimes
+        else:
+            movie.showtimes = None
+        try:
+            db.session.commit()
+            flash('Showtimes updated successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating showtimes: {str(e)}', 'error')
+        return redirect(url_for('movie.view_movies'))
+    return render_template('showtimes.html', movie=movie)
