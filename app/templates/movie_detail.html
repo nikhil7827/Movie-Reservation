@@ -1,19 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
-  <!-- Banner Section -->
-  <div class="banner-section" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ movie.poster_url or 'https://via.placeholder.com/1200x400' }}'); background-size: cover; background-position: center; color: white; padding: 100px 20px; text-align: center; position: relative;">
+  <!-- Header Section -->
+  <div class="header-section" style="background: linear-gradient(to right, #1a1a1a, #4b0082); color: white; padding: 60px 20px; text-align: center; position: relative;">
     <h1 class="display-4">{{ movie.title }}</h1>
-    <p class="lead">{{ movie.description }}</p>
-    <div class="banner-overlay"></div>
+    <div class="header-overlay"></div>
   </div>
 
-  <!-- Movie Details and Seat Selection -->
+  <!-- Main Content -->
   <div class="container mt-5">
     <div class="row">
-      <!-- Movie Info Card -->
+      <!-- Movie Details Card -->
       <div class="col-lg-4 col-md-5 mb-4">
-        <div class="card h-100 shadow-lg movie-info-card">
-          <img src="{{ movie.poster_url or 'https://via.placeholder.com/300x450' }}" class="card-img-top" alt="{{ movie.title }}" style="object-fit: cover; height: 300px;">
+        <div class="card h-100 shadow-lg movie-details-card">
           <div class="card-body text-center">
             <h5 class="card-title">{{ movie.title }}</h5>
             <p class="card-text"><strong>Genre:</strong> {{ movie.genre }}</p>
@@ -22,46 +20,69 @@
         </div>
       </div>
 
-      <!-- Seat Selection -->
+      <!-- Seat Selection Card -->
       <div class="col-lg-8 col-md-7">
         <div class="card shadow-lg p-4 seat-selection-card">
           <h3 class="text-center mb-4">Select Your Seats</h3>
-          <form id="seatForm" method="POST" action="{{ url_for('movie.payment', movie_id=movie.id) }}">
-            <div class="seat-container">
-              <div class="screen-label text-center mb-3">Screen</div>
-              <div class="seat-grid">
-                {% for row in seats %}
-                  <div class="seat-row">
-                    {% for seat in row %}
-                      <input type="checkbox" id="{{ seat }}" name="seats" value="{{ seat }}">
-                      <label for="{{ seat }}" class="seat-label">{{ seat }}</label>
-                    {% endfor %}
-                  </div>
-                {% endfor %}
+          <form method="POST" action="{{ url_for('movie.payment', movie_id=movie.id) }}">
+            <div class="text-center">
+              {% for row in seats %}
+                <div class="seat-row">
+                  {% for seat in row %}
+                    <label class="seat-label">
+                      <input type="checkbox" name="seats" value="{{ seat }}" class="seat-checkbox">
+                      <span class="seat">{{ seat }}</span>
+                    </label>
+                  {% endfor %}
+                </div>
+              {% endfor %}
+              <!-- Screen Representation -->
+              <div class="screen mt-4">
+                <span>SCREEN</span>
               </div>
             </div>
-            <div class="mt-4 text-center">
-              <p><strong>Total Price:</strong> $<span id="totalPrice">0.00</span></p>
-              <button type="submit" class="btn btn-success btn-lg">Book Now</button>
+            <div class="text-center mt-4">
+              <p><strong>Total Price:</strong> <span id="total-price">$0.00</span></p>
+              <button type="submit" class="btn btn-success btn-lg book-btn">Book Now</button>
             </div>
           </form>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- JavaScript for Dynamic Total Price Calculation -->
+  <script>
+    const ticketPrice = {{ movie.ticket_price }};
+    const totalPriceElement = document.getElementById('total-price');
+    const checkboxes = document.querySelectorAll('.seat-checkbox');
+
+    function updateTotalPrice() {
+      const selectedSeats = Array.from(checkboxes).filter(cb => cb.checked).length;
+      const totalPrice = (selectedSeats * ticketPrice).toFixed(2);
+      totalPriceElement.textContent = `$${totalPrice}`;
+    }
+
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateTotalPrice);
+    });
+
+    // Initial calculation
+    updateTotalPrice();
+  </script>
 {% endblock %}
 
 {% block styles %}
 <style>
-  .banner-section {
-    min-height: 300px;
+  .header-section {
+    min-height: 200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     position: relative;
     overflow: hidden;
   }
-  .banner-overlay {
+  .header-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -70,91 +91,98 @@
     background: radial-gradient(circle, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
     z-index: 0;
   }
-  .banner-section h1, .banner-section p {
+  .header-section h1 {
     position: relative;
     z-index: 1;
   }
-  .movie-info-card {
+  .movie-details-card, .seat-selection-card {
     transition: transform 0.3s ease;
     border: none;
-    background: #f8f9fa;
+    background: #ffffff;
   }
-  .movie-info-card:hover {
-    transform: scale(1.03);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-  }
-  .seat-selection-card {
-    background: #fff;
-    border-radius: 10px;
-  }
-  .seat-container {
-    position: relative;
-    padding-bottom: 20px;
+  .movie-details-card:hover, .seat-selection-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
   }
   .seat-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 10px;
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px 0;
   }
   .seat-row {
-    display: contents;
+    display: flex;
+    gap: 10px;
   }
   .seat-label {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 40px;
-    height: 40px;
-    background-color: #e0e0e0;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 14px;
-    color: #333;
+    position: relative;
+    display: inline-block;
   }
-  .seat-label:hover {
-    background-color: #d0d0d0;
-    border-color: #bbb;
-  }
-  input[type="checkbox"]:checked + .seat-label {
-    background-color: #28a745;
-    color: white;
-    border-color: #218838;
-  }
-  input[type="checkbox"] {
+  .seat-checkbox {
     display: none;
   }
-  .screen-label {
-    background-color: #007bff;
-    color: white;
-    padding: 10px;
+  .seat {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    background-color: #e0e0e0;
     border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 14px;
     font-weight: bold;
+    color: #333;
+  }
+  .seat-checkbox:checked + .seat {
+    background-color: #4b0082;
+    color: white;
+    transform: scale(1.1);
+  }
+  .seat:hover {
+    background-color: #d0d0d0;
+    transform: scale(1.05);
+  }
+  .seat-checkbox:checked + .seat:hover {
+    background-color: #370062;
+  }
+  .screen {
+    width: 80%;
+    height: 20px;
+    background: linear-gradient(to bottom, #333, #555);
+    border-radius: 5px 5px 0 0;
+    position: relative;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    line-height: 20px;
+    margin: 20px auto 0;
+  }
+  .screen::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: radial-gradient(circle at 50%, #fff 2px, transparent 3px);
+    background-size: 10px 10px;
+  }
+  .book-btn {
+    background-color: #4b0082;
+    border: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  .book-btn:hover {
+    background-color: #370062;
+    transform: scale(1.05);
   }
   @media (max-width: 768px) {
     .col-lg-4, .col-lg-8 {
       flex: 0 0 100%;
       max-width: 100%;
     }
-    .seat-grid {
-      max-width: 300px;
-    }
   }
 </style>
-{% endblock %}
-
-{% block scripts %}
-<script>
-  const ticketPrice = {{ movie.ticket_price }};
-  const form = document.getElementById('seatForm');
-  const totalPriceSpan = document.getElementById('totalPrice');
-  form.addEventListener('change', () => {
-    const selectedSeats = form.querySelectorAll('input[name="seats"]:checked').length;
-    totalPriceSpan.textContent = (selectedSeats * ticketPrice).toFixed(2);
-  });
-</script>
 {% endblock %}
