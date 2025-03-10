@@ -37,7 +37,7 @@
                 </div>
               {% endfor %}
               <!-- Screen Representation -->
-              <div class="screen mt-4">
+              <div class="screen mt-3">
                 <span>SCREEN</span>
               </div>
             </div>
@@ -104,49 +104,87 @@
     transform: scale(1.02);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
   }
-  .seat-grid {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-  .seat-row {
-    display: flex;
-    gap: 10px;
-  }
-  .seat-label {
-    position: relative;
-    display: inline-block;
-  }
-  .seat-checkbox {
-    display: none;
-  }
-  .seat {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
-    background-color: #e0e0e0;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    font-size: 14px;
-    font-weight: bold;
-    color: #333;
-  }
-  .seat-checkbox:checked + .seat {
-    background-color: #4b0082;
-    color: white;
-    transform: scale(1.1);
-  }
-  .seat:hover {
-    background-color: #d0d0d0;
-    transform: scale(1.05);
-  }
-  .seat-checkbox:checked + .seat:hover {
-    background-color: #370062;
-  }
+  .seating-plan {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .seat {
+            width: 40px;
+            height: 40px;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .seat.accessible {
+            background-color: #3F83D5;
+        }
+
+        .seat.selected {
+            background-color: #FF9800;
+        }
+
+        .seat.unavailable {
+            background-color: #E0E0E0;
+            color: #9E9E9E;
+            cursor: not-allowed;
+            position: relative;
+        }
+
+        .seat.unavailable::before,
+        .seat.unavailable::after {
+            content: '';
+            position: absolute;
+            background-color: #9E9E9E;
+            transform: rotate(45deg);
+        }
+
+        .seat.unavailable::before {
+            width: 2px;
+            height: 30px;
+        }
+
+        .seat.unavailable::after {
+            width: 30px;
+            height: 2px;
+        }
+
+        .zoom-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+            background-color: #333;
+            color: white;
+        }
   .screen {
     width: 80%;
     height: 20px;
