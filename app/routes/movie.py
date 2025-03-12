@@ -13,6 +13,7 @@ def home():
     for movie in all_movies:
         if movie.title not in seen_titles:
             seen_titles.add(movie.title)
+            print(f"Movie: {movie.title}, Showtimes: {movie.showtimes}")
             movies.append(movie)
     return render_template('home.html', movies=movies)
 
@@ -80,6 +81,7 @@ def delete_movie(movie_id):
 @bp.route('/movie/<int:movie_id>', methods=['GET'])
 def movie_detail(movie_id):
     movie = Movie.query.get_or_404(movie_id)
+    print(f"Movie: {movie.title}, Showtime: {movie.showtimes}")
     seats = [[f'{row}{col}' for col in range(1, 6)] for row in 'ABCDE']
     return render_template('movie_detail.html', movie=movie, seats=seats)
 
@@ -107,7 +109,7 @@ def edit_movie(movie_id):
         movie.genre = request.form['genre']
         movie.poster_url = request.form.get('poster_url', '')
         movie.ticket_price = float(request.form.get('ticket_price', 10.00))
-        movie.showtimes = request.form.get('showtimes', '')
+        movie.showtime = request.form.get('showtimes', '')
         try:
             db.session.commit()
             flash('Movie updated successfully!', 'success')
@@ -117,7 +119,7 @@ def edit_movie(movie_id):
             flash(f'Error updating movie: {str(e)}', 'error')
     return render_template('edit_movie.html', movie=movie)
 
-@bp.route('/showtimes/<int:movie_id>', methods=['GET', 'POST'])
+@bp.route('/showtime/<int:movie_id>', methods=['GET', 'POST'])
 @login_required
 def manage_showtimes(movie_id):
     if current_user.role != 'admin':
@@ -125,14 +127,14 @@ def manage_showtimes(movie_id):
         return redirect(url_for('home'))
     movie = Movie.query.get_or_404(movie_id)
     if request.method == 'POST':
-        showtimes = request.form.get('showtimes', '').strip()
-        if showtimes:
-            movie.showtimes = showtimes
+        showtime = request.form.get('showtimes', '').strip()
+        if showtime:
+            movie.showtime = showtime
         else:
-            movie.showtimes = None
+            movie.showtime = None
         try:
             db.session.commit()
-            flash('Showtimes updated successfully!', 'success')
+            flash('Showtime updated successfully!', 'success')
         except Exception as e:
             db.session.rollback()
             flash(f'Error updating showtimes: {str(e)}', 'error')
