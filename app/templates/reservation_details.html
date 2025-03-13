@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Reservation Details</h1>
+    {% if reservations %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Movie</th>
+                    <th>Showtime</th>
+                    <th>Seats</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservation in reservations %}
+                    <tr>
+                        <td>{{ reservation.user.username }}</td>
+                        <td>{{ reservation.movie.title }}</td>
+                        <td>{{ reservation.showtime }}</td>
+                        <td>{{ reservation.seats }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No reservations found.</p>
+    {% endif %}
+{% endblock %}

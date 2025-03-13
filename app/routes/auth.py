@@ -9,17 +9,20 @@ from app.models.user import User
 
 bp = Blueprint('auth', __name__)
 
+
 # Forms
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=50)])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
 
+
 class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=50)])
     email = StringField('Email', validators=[DataRequired(), Email(), Length(max=120)])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Register')
+
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -31,6 +34,7 @@ def login():
             return redirect(url_for('movie.home'))
         flash('Invalid credentials', 'danger')
     return render_template('login.html', form=form)
+
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -48,11 +52,13 @@ def register():
         return redirect(url_for('auth.login'))
     return render_template('register.html', form=form)
 
+
 @bp.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('movie.home'))
+
 
 @bp.route('/dashboard')
 @login_required

@@ -27,41 +27,41 @@ def view_movies():
     movies = Movie.query.all()
     return render_template('view_movies.html', movies=movies)
 
-@bp.route('/add_movie', methods=['GET'])
-@login_required
-def show_add_movie():
-    if current_user.role != 'admin':
-        flash('Permission denied.', 'error')
-        return redirect(url_for('home'))
-    return render_template('add_movie.html')
-
-@bp.route('/add_movie', methods=['POST'])
+@bp.route('/add_movie', methods=['GET', 'POST'])
 @login_required
 def add_movie():
     if current_user.role != 'admin':
-        flash('Permission denied.', 'error')
-        return redirect(url_for('home'))
-    data = request.form
-    existing_movie = Movie.query.filter_by(title=data['title']).first()
-    if existing_movie:
-        flash('A movie with this title already exists.', 'error')
-        return redirect(url_for('movie.show_add_movie'))
-    new_movie = Movie(
-        title=data['title'],
-        description=data['description'],
-        genre=data['genre'],
-        poster_url=data.get('poster_url', ''),
-        ticket_price=float(data.get('ticket_price', 10.00)),
-        showtimes=data.get('showtimes', '')
-    )
-    try:
-        db.session.add(new_movie)
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('movie.home'))
+
+    if request.method == 'POST':
+        title = request.form.get('title')
+        description = request.form.get('description')
+        genre = request.form.get('genre')
+        poster_url = request.form.get('poster_url')
+        ticket_price = float(request.form.get('ticket_price', 10.00))
+        showtimes = request.form.get('showtimes')
+
+        # Validate input
+        if not title or not description or not genre:
+            flash('Title, description, and genre are required.', 'danger')
+            return redirect(url_for('movie.add_movie'))
+
+        # Create new movie
+        movie = Movie(
+            title=title,
+            description=description,
+            genre=genre,
+            poster_url=poster_url,
+            ticket_price=ticket_price,
+            showtimes=showtimes
+        )
+        db.session.add(movie)
         db.session.commit()
         flash('Movie added successfully!', 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'Error: {str(e)}', 'error')
-    return redirect(url_for('movie.view_movies'))
+        return redirect(url_for('auth.dashboard'))
+
+    return render_template('add_movie.html')
 
 @bp.route('/delete_movie/<int:movie_id>', methods=['POST'])
 @login_required
