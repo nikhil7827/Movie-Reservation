@@ -13,6 +13,7 @@ def home():
     for movie in all_movies:
         if movie.title not in seen_titles:
             seen_titles.add(movie.title)
+            showtimes = getattr(movie, 'showtimes', None)  # Safe access
             print(f"Movie: {movie.title}, Showtimes: {movie.showtimes}")
             movies.append(movie)
     return render_template('home.html', movies=movies)

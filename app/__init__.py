@@ -3,12 +3,13 @@ from dotenv import load_dotenv
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate  # Add this import
+from flask_migrate import Migrate
 
 # Initialize extensions globally (but without an app yet)
 db = SQLAlchemy()
 login_manager = LoginManager()
-migrate = Migrate()  # Initialize Migrate
+migrate = Migrate()
+
 
 def create_app():
     # Create the Flask app instance
@@ -41,22 +42,32 @@ def create_app():
     app.register_blueprint(movie.bp)
     app.register_blueprint(reservation.bp, url_prefix='/reservations')
 
-    # Create database tables and seed initial data
-    with app.app_context():
-        db.create_all()
-        seed_initial_data()
-
     return app
+
 
 def seed_initial_data():
     from app.models.user import User
+    from app import db
     if not User.query.filter_by(username='admin').first():
         admin = User(username='admin', email='admin@example.com', role='admin')
-        admin.set_password('admin123')  # Change this in production
+        admin.set_password('admin123')
         db.session.add(admin)
         db.session.commit()
+        print("Seeded initial admin user.")
+
+if __name__ == '__main__':
+    app = create_app()
+    if app:
+        with app.app_context():
+            seed_initial_data()
+        app.run(debug=True)
+    else:
+        print("Failed to create Flask app. Exiting.")
+
 
 # If you want to run the app directly
 if __name__ == '__main__':
     app = create_app()
+    with app.app_context():
+        seed_initial_data()  # Seed data after app context is set
     app.run(debug=True)
