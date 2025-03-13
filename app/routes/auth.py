@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_login import login_user, logout_user, login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, Length, Email
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
 from app.models.user import User
@@ -17,6 +17,7 @@ class LoginForm(FlaskForm):
 
 class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=50)])
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(max=120)])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Register')
 
@@ -25,9 +26,9 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        if user and check_password_hash(user.password, form.password.data):
+        if user and user.check_password(form.password.data):  # Use check_password method
             login_user(user)
-            return redirect(url_for('movie.dashboard'))  # Update to your dashboard route
+            return redirect(url_for('movie.home'))
         flash('Invalid credentials', 'danger')
     return render_template('login.html', form=form)
 
@@ -35,21 +36,25 @@ def login():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        hashed_password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
-        new_user = User(username=form.username.data, password=hashed_password)  # Fixed: Added username
-        db.session.add(new_user)
+        existing_user = User.query.filter_by(username=form.username.data).first()
+        if existing_user:
+            flash('Username already exists.', 'danger')
+            return redirect(url_for('auth.register'))
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
         db.session.commit()
         flash('Account created! You can now login.', 'success')
         return redirect(url_for('auth.login'))
     return render_template('register.html', form=form)
-
-@bp.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template('movies.html', user=current_user)
 
 @bp.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('movie.home'))
+
+@bp.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('movies.html', user=current_user)
