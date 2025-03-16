@@ -10,6 +10,5 @@ def reservation_details():
         flash('You do not have permission to access this page.', 'danger')
         return redirect(url_for('movie.home'))
 
-    # Placeholder: Add logic to fetch reservation details from the database
     reservations = []  # Replace with actual database query
-    return render_template('reservation_details.html', reservations=reservations)
+    return render_template('reservation_details.html', reservations=reservations, user=current_user)

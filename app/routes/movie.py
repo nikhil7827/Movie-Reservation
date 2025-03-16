@@ -63,6 +63,8 @@ def add_movie():
 
     return render_template('add_movie.html')
 
+
+
 @bp.route('/delete_movie/<int:movie_id>', methods=['POST'])
 @login_required
 def delete_movie(movie_id):
