@@ -33,6 +33,12 @@ def create_app():
         migrate.init_app(app, db)
         login_manager.login_view = 'auth.auth_user_login'
 
+        # Define user loader for Flask-Login
+        from app.models.user import User
+        @login_manager.user_loader
+        def load_user(user_id):
+            return User.query.get(int(user_id))
+
         with app.app_context():
             from app.routes import auth, movie, reservation
             print("Registering blueprints...")
