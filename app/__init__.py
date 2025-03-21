@@ -31,25 +31,23 @@ def create_app():
         db.init_app(app)
         login_manager.init_app(app)
         migrate.init_app(app, db)
-        login_manager.login_view = 'auth.user_login'  # Updated to match new endpoint
+        login_manager.login_view = 'auth.auth_user_login'
 
-        from app.models.user import User
-        @login_manager.user_loader
-        def load_user(user_id):
-            return User.query.get(int(user_id))
-
-        # Defer blueprint registration
         with app.app_context():
             from app.routes import auth, movie, reservation
             print("Registering blueprints...")
+            print("Before auth blueprint:", [rule.endpoint for rule in app.url_map.iter_rules()])
             app.register_blueprint(auth.bp)
+            print("After auth blueprint:", [rule.endpoint for rule in app.url_map.iter_rules()])
             app.register_blueprint(movie.bp)
+            print("After movie blueprint:", [rule.endpoint for rule in app.url_map.iter_rules()])
             app.register_blueprint(reservation.bp, url_prefix='/reservations')
+            print("After reservation blueprint:", [rule.endpoint for rule in app.url_map.iter_rules()])
 
             from app.models.movie import Movie
             from app.models.user import User
 
-            print("Registered endpoints:", [rule.endpoint for rule in app.url_map.iter_rules()])
+            print("Final registered endpoints:", [rule.endpoint for rule in app.url_map.iter_rules()])
             print("Flask app successfully initialized.")
         return app
 

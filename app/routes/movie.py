@@ -27,13 +27,12 @@ def view_movies():
     movies = Movie.query.all()
     return render_template('view_movies.html', movies=movies)
 
-@bp.route('/add_movie', methods=['GET', 'POST'])
+@bp.route('/add_movie', methods=['GET', 'POST'], endpoint='movie_add_movie')
 @login_required
 def add_movie():
     if current_user.role != 'admin':
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('movie.home'))
-
+        return redirect(url_for('movie.movie_home'))
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
@@ -41,26 +40,14 @@ def add_movie():
         poster_url = request.form.get('poster_url')
         ticket_price = float(request.form.get('ticket_price', 10.00))
         showtimes = request.form.get('showtimes')
-
-        # Validate input
         if not title or not description or not genre:
             flash('Title, description, and genre are required.', 'danger')
-            return redirect(url_for('movie.add_movie'))
-
-        # Create new movie
-        movie = Movie(
-            title=title,
-            description=description,
-            genre=genre,
-            poster_url=poster_url,
-            ticket_price=ticket_price,
-            showtimes=showtimes
-        )
+            return redirect(url_for('movie.movie_add_movie'))
+        movie = Movie(title=title, description=description, genre=genre, poster_url=poster_url, ticket_price=ticket_price, showtimes=showtimes)
         db.session.add(movie)
         db.session.commit()
         flash('Movie added successfully!', 'success')
-        return redirect(url_for('auth.dashboard'))
-
+        return redirect(url_for('auth.auth_user_dashboard'))
     return render_template('add_movie.html')
 
 

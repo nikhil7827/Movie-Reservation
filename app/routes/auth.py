@@ -9,13 +9,11 @@ from app.models.user import User
 
 bp = Blueprint('auth', __name__)
 
-
 # Forms
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=50)])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
-
 
 class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=50)])
@@ -23,63 +21,40 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Register')
 
-
-@bp.route('/login', methods=['GET', 'POST'])
+@bp.route('/login', methods=['GET', 'POST'], endpoint='auth_user_login')
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
-            return redirect(url_for('movie.home'))
+            return redirect(url_for('movie.movie_home'))
         flash('Invalid credentials', 'danger')
     return render_template('login.html', form=form, user=current_user)
 
-@bp.route('/register', methods=['GET', 'POST'], endpoint='user_register')
+@bp.route('/register', methods=['GET', 'POST'], endpoint='auth_user_register')
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
         existing_user = User.query.filter_by(username=form.username.data).first()
         if existing_user:
             flash('Username already exists.', 'danger')
-            return redirect(url_for('auth.user_register'))
+            return redirect(url_for('auth.auth_user_register'))
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
         flash('Account created! You can now login.', 'success')
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('auth.auth_user_login'))
     return render_template('register.html', form=form, user=current_user)
-@bp.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template('movies.html', user=current_user)
 
-@bp.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegisterForm()
-    if form.validate_on_submit():
-        existing_user = User.query.filter_by(username=form.username.data).first()
-        if existing_user:
-            flash('Username already exists.', 'danger')
-            return redirect(url_for('auth.register'))
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('Account created! You can now login.', 'success')
-        return redirect(url_for('auth.login'))
-    return render_template('register.html', form=form)
-
-
-@bp.route('/logout')
+@bp.route('/logout', endpoint='auth_user_logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('movie.home'))
+    return redirect(url_for('movie.movie_home'))
 
-
-@bp.route('/dashboard')
+@bp.route('/dashboard', endpoint='auth_user_dashboard')
 @login_required
-def dashboard():
+def admin_dashboard():  # Renamed from 'dashboard'
     return render_template('movies.html', user=current_user)
