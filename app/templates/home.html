@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
     <h1>Welcome to Movie Reservation</h1>
-    {% if user.is_authenticated %}
-        <p>Hello, {{ user.username }}!</p>
+    {% if current_user.is_authenticated %}
+        <p>Hello, {{ current_user.username }}!</p>
     {% else %}
-        <p>Please <a href="{{ url_for('auth.login') }}">login</a> or <a href="{{ url_for('auth.register') }}">register</a>.</p>
+        <p>Please <a href="{{ url_for('auth.auth_user_login') }}">login</a> or <a href="{{ url_for('auth.auth_user_register') }}">register</a>.</p>
     {% endif %}
     <div class="row">
         {% for movie in movies %}

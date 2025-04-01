@@ -32,7 +32,7 @@ def view_movies():
 def add_movie():
     if current_user.role != 'admin':
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('movie.movie_home'))
+        return redirect(url_for('movie.home'))
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')

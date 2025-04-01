@@ -28,7 +28,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
-            return redirect(url_for('movie.movie_home'))
+            return redirect(url_for('movie.home'))
         flash('Invalid credentials', 'danger')
     return render_template('login.html', form=form, user=current_user)
 
@@ -52,7 +52,7 @@ def register():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('movie.movie_home'))
+    return redirect(url_for('movie.home'))
 
 @bp.route('/dashboard', endpoint='auth_user_dashboard')
 @login_required
