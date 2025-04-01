@@ -36,32 +36,4 @@
     {% else %}
         <p>No movies available. Add a movie to get started!</p>
     {% endif %}
-    <h2>Add New Movie</h2>
-    <form method="POST" action="{{ url_for('movie.movie_add_movie') }}">
-        <div class="form-group">
-            <label for="title">Title</label>
-            <input type="text" class="form-control" id="title" name="title" required>
-        </div>
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea class="form-control" id="description" name="description" required></textarea>
-        </div>
-        <div class="form-group">
-            <label for="genre">Genre</label>
-            <input type="text" class="form-control" id="genre" name="genre" required>
-        </div>
-        <div class="form-group">
-            <label for="poster_url">Poster URL</label>
-            <input type="text" class="form-control" id="poster_url" name="poster_url">
-        </div>
-        <div class="form-group">
-            <label for="ticket_price">Ticket Price</label>
-            <input type="number" step="0.01" class="form-control" id="ticket_price" name="ticket_price" value="10.00">
-        </div>
-        <div class="form-group">
-            <label for="showtimes">Showtimes</label>
-            <input type="text" class="form-control" id="showtimes" name="showtimes" placeholder="e.g., 10:00 AM, 2:00 PM, 6:00 PM">
-        </div>
-        <button type="submit" class="btn btn-primary">Add Movie</button>
-    </form>
 {% endblock %}
