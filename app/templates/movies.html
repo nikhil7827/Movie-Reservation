@@ -1,44 +1,67 @@
 {% extends "base.html" %}
 {% block content %}
-  <h1>Movies</h1>
-
-  <!-- Display flash messages -->
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">{{ message }}</div>
-      {% endfor %}
+    <h1>Admin Dashboard</h1>
+    <p>Welcome, {{ current_user.username }}!</p>
+    <a href="{{ url_for('movie.movie_add_movie') }}" class="btn btn-primary">Add Movie</a>
+    <a href="{{ url_for('reservation.reservation_details') }}" class="btn btn-primary">View Reservations</a>
+    <h2>Movies</h2>
+    {% if movies %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Genre</th>
+                    <th>Ticket Price</th>
+                    <th>Showtimes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for movie in movies %}
+                    <tr>
+                        <td>{{ movie.title }}</td>
+                        <td>{{ movie.genre }}</td>
+                        <td>${{ "%.2f" | format(movie.ticket_price) }}</td>
+                        <td>{{ movie.showtimes if movie.showtimes else "Not set" }}</td>
+                        <td>
+                            <a href="{{ url_for('movie.edit_movie', movie_id=movie.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                            <form action="{{ url_for('movie.delete_movie', movie_id=movie.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete {{ movie.title }}?')">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No movies available. Add a movie to get started!</p>
     {% endif %}
-  {% endwith %}
-
-  <!-- List of movies -->
-  <ul>
-    {% for movie in movies %}
-      <li>{{ movie.title }} ({{ movie.genre }}) - {{ movie.description }}</li>
-    {% endfor %}
-  </ul>
-
-  <!-- Add movie form (visible to admins only) -->
-  {% if current_user.is_authenticated and current_user.role == 'admin' %}
-    <h2>Add a New Movie</h2>
-    <form method="POST" action="{{ url_for('movie.add_movie') }}">
-      <div>
-        <label for="title">Title:</label>
-        <input type="text" id="title" name="title" required>
-      </div>
-      <div>
-        <label for="description">Description:</label>
-        <textarea id="description" name="description" required></textarea>
-      </div>
-      <div>
-        <label for="genre">Genre:</label>
-        <input type="text" id="genre" name="genre" required>
-      </div>
-      <div>
-        <label for="poster_url">https://images.app.goo.gl/8cpw6UyHvMSSMTx17 </label>
-        <input type="url" id="poster_url" name="poster_url">
-      </div>
-      <button type="submit">Add Movie</button>
+    <h2>Add New Movie</h2>
+    <form method="POST" action="{{ url_for('movie.movie_add_movie') }}">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" name="description" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="genre">Genre</label>
+            <input type="text" class="form-control" id="genre" name="genre" required>
+        </div>
+        <div class="form-group">
+            <label for="poster_url">Poster URL</label>
+            <input type="text" class="form-control" id="poster_url" name="poster_url">
+        </div>
+        <div class="form-group">
+            <label for="ticket_price">Ticket Price</label>
+            <input type="number" step="0.01" class="form-control" id="ticket_price" name="ticket_price" value="10.00">
+        </div>
+        <div class="form-group">
+            <label for="showtimes">Showtimes</label>
+            <input type="text" class="form-control" id="showtimes" name="showtimes" placeholder="e.g., 10:00 AM, 2:00 PM, 6:00 PM">
+        </div>
+        <button type="submit" class="btn btn-primary">Add Movie</button>
     </form>
-  {% endif %}
 {% endblock %}

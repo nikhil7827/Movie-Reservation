@@ -6,6 +6,7 @@ from wtforms.validators import DataRequired, Length, Email
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
 from app.models.user import User
+from app.models.movie import Movie  # Import the Movie model
 
 bp = Blueprint('auth', __name__)
 
@@ -56,5 +57,9 @@ def logout():
 
 @bp.route('/dashboard', endpoint='auth_user_dashboard')
 @login_required
-def admin_dashboard():  # Renamed from 'dashboard'
-    return render_template('movies.html', user=current_user)
+def admin_dashboard():
+    if current_user.role != 'admin':
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('movie.home'))
+    movies = Movie.query.all()  # Fetch all movies from the database
+    return render_template('movies.html', user=current_user, movies=movies)
