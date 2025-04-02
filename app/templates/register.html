@@ -4,12 +4,16 @@
         <div class="col-md-6 col-lg-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <h1 class="card-title fw-bold text-primary mb-4 text-center">Login</h1>
-                    <form method="POST" action="{{ url_for('auth.auth_user_login') }}">
+                    <h1 class="card-title fw-bold text-primary mb-4 text-center">Register</h1>
+                    <form method="POST" action="{{ url_for('auth.auth_user_register') }}">
                         {{ form.hidden_tag() }}
                         <div class="mb-3">
                             {{ form.username.label(class="form-label d-block text-center") }}
                             {{ form.username(class="form-control", placeholder="Enter your username") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label d-block text-center") }}
+                            {{ form.email(class="form-control", placeholder="Enter your email") }}
                         </div>
                         <div class="mb-3">
                             {{ form.password.label(class="form-label d-block text-center") }}
@@ -19,7 +23,7 @@
                             {{ form.submit(class="btn btn-primary btn-lg w-100") }}
                         </div>
                     </form>
-                    <p class="text-center">Don't have an account? <a href="{{ url_for('auth.auth_user_register') }}" class="text-primary">Register here</a>.</p>
+                    <p class="text-center">Already have an account? <a href="{{ url_for('auth.auth_user_login') }}" class="text-primary">Login here</a>.</p>
                 </div>
             </div>
         </div>

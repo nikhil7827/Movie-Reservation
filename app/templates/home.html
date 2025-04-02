@@ -1,29 +1,80 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Welcome to Movie Reservation</h1>
-    {% if current_user.is_authenticated %}
-        <p>Hello, {{ current_user.username }}!</p>
-    {% else %}
-        <p>Please <a href="{{ url_for('auth.auth_user_login') }}">login</a> or <a href="{{ url_for('auth.auth_user_register') }}">register</a>.</p>
-    {% endif %}
-    <div class="row">
-        {% for movie in movies %}
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <img src="{{ movie.poster_url }}" class="card-img-top" alt="{{ movie.title }}">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ movie.title }}</h5>
-                        <p class="card-text"><strong>Genre:</strong> {{ movie.genre }}</p>
-                        <p class="card-text"><strong>Price:</strong> ${{ movie.ticket_price }}</p>
-                        {% if movie.showtimes %}
-                            <p class="card-text"><strong>Showtimes:</strong> {{ movie.showtimes }}</p>
-                        {% else %}
-                            <p class="card-text"><em>No showtimes available</em></p>
-                        {% endif %}
-                        <a href="#" class="btn btn-primary">Book Now</a>
+    <!-- Hero Section -->
+    <div class="container my-5">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary">Welcome to Movie Reservation</h1>
+            {% if current_user.is_authenticated %}
+                <p class="lead text-muted">Hello, {{ current_user.username }}! Ready to book your next movie?</p>
+            {% else %}
+                <p class="lead text-muted">
+                    Please <a href="{{ url_for('auth.auth_user_login') }}" class="text-primary">login</a> or
+                    <a href="{{ url_for('auth.auth_user_register') }}" class="text-primary">register</a> to start booking.
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Movies Grid -->
+        {% if movies %}
+            <div class="row">
+                {% for movie in movies %}
+                    <div class="col-md-4 col-sm-4 mb-4">
+                        <div class="card h-100 shadow-sm border-1 movie-card">
+                            <!-- Movie Poster -->
+                            <img src="{{ movie.poster_url if movie.poster_url else 'https://via.placeholder.com/300x450?text=No+Poster' }}"
+                                 class="card-img-top"
+                                 alt="{{ movie.title }}"
+                                 style="height: 300px; object-fit: cover;">
+                            <div class="card-body">
+                                <!-- Movie Title -->
+                                <h5 class="card-title fw-bold">{{ movie.title }}</h5>
+                                <!-- Movie Description (Truncated) -->
+                                <p class="card-text text-muted">
+                                    {{ movie.description|truncate(100, True) if movie.description else "No description available." }}
+                                </p>
+                                <!-- Movie Details -->
+                                <p class="card-text"><strong>Genre:</strong> {{ movie.genre }}</p>
+                                <p class="card-text"><strong>Price:</strong> ${{ "%.2f" | format(movie.ticket_price) }}</p>
+                                {% if movie.showtimes %}
+                                    <p class="card-text"><strong>Showtimes:</strong> {{ movie.showtimes }}</p>
+                                {% else %}
+                                    <p class="card-text text-muted"><em>No showtimes available</em></p>
+                                {% endif %}
+                                <!-- Book Now Button -->
+                                <a href="{{ url_for('movie.movie_detail', movie_id=movie.id) }}"
+                                   class="btn btn-primary w-100">Book Now</a>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+        {% else %}
+            <div class="text-center">
+                <p class="lead text-muted">No movies available at the moment. Check back later!</p>
+            </div>
+        {% endif %}
     </div>
+
+    <!-- Custom CSS for Hover Effects -->
+    <style>
+        .movie-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+        }
+        .card-img-top {
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+    </style>
 {% endblock %}

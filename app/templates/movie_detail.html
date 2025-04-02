@@ -1,222 +1,140 @@
 {% extends "base.html" %}
 {% block content %}
-  <!-- Header Section -->
-  <div class="header-section" style="background: linear-gradient(to right, #1a1a1a, #4b0082); color: white; padding: 60px 20px; text-align: center; position: relative;">
-    <h1 class="display-4">{{ movie.title }}</h1>
-    <div class="header-overlay"></div>
-  </div>
-
-  <!-- Main Content -->
-  <div class="container mt-5">
-    <div class="row">
-      <!-- Movie Details Card -->
-      <div class="col-lg-4 col-md-5 mb-4">
-        <div class="card h-100 shadow-lg movie-details-card">
-          <div class="card-body text-center">
-            <h5 class="card-title">{{ movie.title }}</h5>
-            <p class="card-text"><strong>Genre:</strong> {{ movie.genre }}</p>
-            <p class="card-text"><strong>Ticket Price per Seat:</strong> ${{ movie.ticket_price }}</p>
-            {% if movie.showtimes %}
-              <p class="card-text"><strong>Showtime:</strong> {{ movie.showtimes }}</p>
-            {% else %}
-              <p class="card-text"><em>No showtime available</em></p>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-
-      <!-- Seat Selection Card -->
-      <div class="col-lg-8 col-md-7">
-        <div class="card shadow-lg p-4 seat-selection-card">
-          <h3 class="text-center mb-4">Select Your Seats</h3>
-          <form method="POST" action="{{ url_for('movie.payment', movie_id=movie.id) }}">
-            <div class="seat-grid">
-              {% for row in seats %}
-                <div class="seat-row">
-                  {% for seat in row %}
-                    <label class="seat-label">
-                      <input type="checkbox" name="seats" value="{{ seat }}" class="seat-checkbox">
-                      <span class="seat available">
-                        <i class="fas fa-chair"></i> {{ seat }}
-                      </span>
-                    </label>
-                  {% endfor %}
-                </div>
-              {% endfor %}
-              <!-- Enhanced Screen Representation -->
-              <div class="screen-container mt-5">
-                <div class="screen">
-                  <span class="screen-text">SCREEN</span>
-                </div>
-              </div>
+    <div class="container my-5">
+        <!-- Movie Details Section -->
+        <div class="row mb-5">
+            <!-- Movie Poster -->
+            <div class="col-md-4">
+                <img src="{{ movie.poster_url if movie.poster_url else 'https://via.placeholder.com/300x450?text=No+Poster' }}"
+                     class="img-fluid rounded shadow-sm"
+                     alt="{{ movie.title }}"
+                     style="max-height: 450px; object-fit: cover;">
             </div>
-            <div class="text-center mt-4">
-              <p><strong>Total Price:</strong> <span id="total-price">$0.00</span></p>
-              <button type="submit" class="btn btn-success btn-lg book-btn">Book Now</button>
+            <!-- Movie Details -->
+            <div class="col-md-8">
+                <h1 class="fw-bold text-primary">{{ movie.title }}</h1>
+                <p class="lead text-muted">{{ movie.description if movie.description else "No description available." }}</p>
+                <p><strong>Genre:</strong> {{ movie.genre }}</p>
+                <p><strong>Ticket Price per Seat:</strong> ${{ "%.2f" | format(movie.ticket_price) }}</p>
+                <p><strong>Showtimes:</strong> {{ movie.showtimes if movie.showtimes else "Not set" }}</p>
             </div>
-          </form>
         </div>
-      </div>
+
+        <!-- Seat Selection Section -->
+        <div class="card shadow-sm border-1">
+            <div class="card-body">
+                <h2 class="card-title fw-bold mb-4 text-center">Select Your Seats</h2>
+                <form method="POST" action="{{ url_for('movie.payment', movie_id=movie.id) }}">
+                    <!-- Showtime Selection -->
+                    <div class="mb-4 d-flex justify-content-center align-items-center flex-column">
+                        <label for="showtime" class="form-label"><strong>Select Showtime:</strong></label>
+                        <select name="showtime" id="showtime" class="form-select w-25" required>
+                            <option value="" disabled selected>Select a showtime</option>
+                            {% for time in movie.showtimes.split(', ') %}
+                                <option value="{{ time }}">{{ time }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Seat Selection Grid -->
+                    <div class="seat-grid mb-4">
+                        {% for row in 'ABCDE' %}
+                            <div class="seat-row d-flex align-items-center mb-2">
+                                <span class="seat-label me-3">{{ row }}</span>
+                                {% for col in range(1, 16) %}
+                                    <div class="seat me-2">
+                                        <input type="checkbox"
+                                               name="seats"
+                                               id="{{ row ~ col }}"
+                                               value="{{ row ~ col }}"
+                                               class="seat-checkbox d-none">
+                                        <label for="{{ row ~ col }}"
+                                               class="seat-label btn btn-outline-secondary p-2">
+                                            {{ col }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Screen Indicator -->
+                    <div class="text-center my-4">
+                        <div class="screen bg-dark text-white py-2 rounded">SCREEN</div>
+                    </div>
+
+                    <!-- Selected Seats and Total Price -->
+                    <div class="mb-4 text-center">
+                        <p><strong>Selected Seats:</strong> <span id="selected-seats"></span></p>
+                        <p><strong>Total Price:</strong> $<span id="total-price">0.00</span></p>
+                    </div>
+
+                    <!-- Proceed to Payment Button -->
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">Proceed to Payment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- JavaScript for Dynamic Total Price Calculation -->
-  <script>
-    const ticketPrice = {{ movie.ticket_price }};
-    const totalPriceElement = document.getElementById('total-price');
-    const checkboxes = document.querySelectorAll('.seat-checkbox');
+    <!-- Custom CSS and JavaScript for Seat Selection -->
+    <style>
+        .seat-grid {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .seat-row {
+            display: flex;
+            align-items: center;
+        }
+        .seat-label {
+            font-weight: bold;
+        }
+        .seat {
+            position: relative;
+        }
+        .seat-checkbox:checked + .seat-label {
+            background-color: #28a745 !important;
+            color: white;
+            border-color: #28a745 !important;
+        }
+        .seat-label {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .seat-label:hover {
+            background-color: #e9ecef;
+        }
+        .screen {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
 
-    function updateTotalPrice() {
-      const selectedSeats = Array.from(checkboxes).filter(cb => cb.checked).length;
-      const totalPrice = (selectedSeats * ticketPrice).toFixed(2);
-      totalPriceElement.textContent = `$${totalPrice}`;
-    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ticketPrice = {{ movie.ticket_price }};
+            const seatCheckboxes = document.querySelectorAll('.seat-checkbox');
+            const selectedSeatsSpan = document.getElementById('selected-seats');
+            const totalPriceSpan = document.getElementById('total-price');
 
-    checkboxes.forEach(checkbox => {
-      checkbox.addEventListener('change', updateTotalPrice);
-    });
+            function updateSelection() {
+                const selectedSeats = Array.from(seatCheckboxes)
+                    .filter(checkbox => checkbox.checked)
+                    .map(checkbox => checkbox.value);
+                selectedSeatsSpan.textContent = selectedSeats.join(', ') || 'None';
+                const totalPrice = selectedSeats.length * ticketPrice;
+                totalPriceSpan.textContent = totalPrice.toFixed(2);
+            }
 
-    // Initial calculation
-    updateTotalPrice();
-  </script>
-{% endblock %}
+            seatCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelection);
+            });
 
-{% block styles %}
-<style>
-  .header-section {
-    min-height: 200px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .header-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
-    z-index: 0;
-  }
-  .header-section h1 {
-    position: relative;
-    z-index: 1;
-  }
-  .movie-details-card, .seat-selection-card {
-    transition: transform 0.3s ease;
-    border: none;
-    background: #ffffff;
-  }
-  .movie-details-card:hover, .seat-selection-card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-  }
-  .seat-grid {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 10px;
-  }
-  .seat-row {
-    display: flex;
-    gap: 15px;
-  }
-  .seat-label {
-    position: relative;
-    display: inline-block;
-  }
-  .seat-checkbox {
-    display: none;
-  }
-  .seat {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(145deg, #d9d9d9, #ffffff);
-    border-radius: 10px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2), -2px -2px 5px rgba(255, 255, 255, 0.5);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 12px;
-    color: #333;
-  }
-  .seat i {
-    margin-right: 5px;
-  }
-  .seat.available {
-    background: linear-gradient(145deg, #90ee90, #98fb98);
-  }
-  .seat-checkbox:checked + .seat {
-    background: linear-gradient(145deg, #4b0082, #6a0dad);
-    color: white;
-    transform: scale(1.1);
-    box-shadow: 2px 2px 10px rgba(75, 0, 130, 0.5);
-  }
-  .seat:hover {
-    transform: scale(1.05);
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3), -2px -2px 5px rgba(255, 255, 255, 0.7);
-  }
-  .seat-checkbox:checked + .seat:hover {
-    background: linear-gradient(145deg, #370062, #5a0a9a);
-  }
-  .screen-container {
-    text-align: center;
-    position: relative;
-  }
-  .screen {
-    display: inline-block;
-    width: 80%;
-    padding: 20px 40px;
-    background: linear-gradient(to bottom, #666, #333);
-    border-radius: 10px 10px 0 0;
-    clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 0 -5px 10px rgba(255, 255, 255, 0.2) inset;
-    overflow: hidden;
-  }
-  .screen::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    left: 0;
-    width: 100%;
-    height: 30px;
-    background: radial-gradient(circle at 50%, rgba(255, 255, 255, 0.8) 5%, transparent 15%);
-    opacity: 0.7;
-  }
-  .screen-text {
-    position: relative;
-    z-index: 1;
-    color: #fff;
-    font-family: 'Arial', sans-serif;
-    font-size: 18px;
-    font-weight: bold;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
-  }
-  .book-btn {
-    background-color: #4b0082;
-    border: none;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-  .book-btn:hover {
-    background-color: #370062;
-    transform: scale(1.05);
-  }
-  @media (max-width: 768px) {
-    .col-lg-4, .col-lg-8 {
-      flex: 0 0 100%;
-      max-width: 100%;
-    }
-    .seat {
-      width: 40px;
-      height: 40px;
-    }
-  }
-</style>
+            // Initial update
+            updateSelection();
+        });
+    </script>
 {% endblock %}

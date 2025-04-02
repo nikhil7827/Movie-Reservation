@@ -29,7 +29,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
-            return redirect(url_for('movie.home'))
+            return redirect(url_for('movie.movie_home'))
         flash('Invalid credentials', 'danger')
     return render_template('login.html', form=form, user=current_user)
 
@@ -38,8 +38,12 @@ def register():
     form = RegisterForm()
     if form.validate_on_submit():
         existing_user = User.query.filter_by(username=form.username.data).first()
+        existing_email = User.query.filter_by(email=form.email.data).first()
         if existing_user:
             flash('Username already exists.', 'danger')
+            return redirect(url_for('auth.auth_user_register'))
+        if existing_email:
+            flash('Email already exists.', 'danger')
             return redirect(url_for('auth.auth_user_register'))
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
@@ -53,7 +57,7 @@ def register():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('movie.home'))
+    return redirect(url_for('movie.movie_home'))
 
 @bp.route('/dashboard', endpoint='auth_user_dashboard')
 @login_required

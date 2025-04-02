@@ -1,31 +1,30 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
 from app import db
 from app.models.movie import Movie
+import os
 
 bp = Blueprint('movie', __name__)
 
-@bp.route('/')
+@bp.route('/', endpoint='movie_home')
 def home():
+    print("Attempting to render 'home.html'")
+    print("Current working directory:", os.getcwd())
     all_movies = Movie.query.all()
     seen_titles = set()
     movies = []
     for movie in all_movies:
         if movie.title not in seen_titles:
             seen_titles.add(movie.title)
-            showtimes = getattr(movie, 'showtimes', None)  # Safe access
-            print(f"Movie: {movie.title}, Showtimes: {movie.showtimes}")
+            showtimes = getattr(movie, 'showtimes', None)
+            print(f"Movie: {movie.title}, Showtimes: {showtimes}")
             movies.append(movie)
-    return render_template('home.html', movies=movies)
+    return render_template('home.html', movies=movies, user=current_user)
 
-@bp.route('/movies')
-@login_required
+@bp.route('/movies', endpoint='view_movies')
 def view_movies():
-    if current_user.role != 'admin':
-        flash('Permission denied.', 'error')
-        return redirect(url_for('home'))
     movies = Movie.query.all()
-    return render_template('view_movies.html', movies=movies)
+    return render_template('view_movies.html', movies=movies, user=current_user)
 
 @bp.route('/add_movie', methods=['GET', 'POST'], endpoint='movie_add_movie')
 @login_required
@@ -48,85 +47,72 @@ def add_movie():
         db.session.commit()
         flash('Movie added successfully!', 'success')
         return redirect(url_for('auth.auth_user_dashboard'))
-    return render_template('add_movie.html')
+    return render_template('add_movie.html', user=current_user)
 
-
-
-@bp.route('/delete_movie/<int:movie_id>', methods=['POST'])
+@bp.route('/delete_movie/<int:movie_id>', methods=['POST'], endpoint='delete_movie')
 @login_required
 def delete_movie(movie_id):
     if current_user.role != 'admin':
-        flash('Permission denied.', 'error')
-        return redirect(url_for('home'))
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('movie.home'))
     movie = Movie.query.get_or_404(movie_id)
-    try:
-        db.session.delete(movie)
-        db.session.commit()
-        flash('Movie deleted successfully!', 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'Error deleting movie: {str(e)}', 'error')
-    return redirect(url_for('movie.view_movies'))
+    db.session.delete(movie)
+    db.session.commit()
+    flash('Movie deleted successfully!', 'success')
+    return redirect(url_for('auth.auth_user_dashboard'))
 
-@bp.route('/movie/<int:movie_id>', methods=['GET'])
+@bp.route('/movie/<int:movie_id>', endpoint='movie_detail')
 def movie_detail(movie_id):
     movie = Movie.query.get_or_404(movie_id)
-    print(f"Movie: {movie.title}, Showtime: {movie.showtimes}")
-    seats = [[f'{row}{col}' for col in range(1, 6)] for row in 'ABCDE']
-    return render_template('movie_detail.html', movie=movie, seats=seats)
+    return render_template('movie_detail.html', movie=movie, user=current_user)
 
-@bp.route('/payment/<int:movie_id>', methods=['POST'])
+@bp.route('/payment/<int:movie_id>', methods=['GET', 'POST'], endpoint='payment')
 @login_required
 def payment(movie_id):
     movie = Movie.query.get_or_404(movie_id)
-    selected_seats = request.form.getlist('seats')
-    if not selected_seats:
-        flash('Please select at least one seat to proceed.', 'error')
-        return redirect(url_for('movie.movie_detail', movie_id=movie.id))
-    total_price = len(selected_seats) * movie.ticket_price
-    return render_template('payment.html', movie=movie, selected_seats=selected_seats, total_price=total_price)
+    if request.method == 'POST':
+        selected_seats = request.form.getlist('seats')
+        showtime = request.form.get('showtime')
+        if not selected_seats:
+            flash('Please select at least one seat.', 'danger')
+            return redirect(url_for('movie.movie_detail', movie_id=movie_id))
+        if not showtime:
+            flash('Please select a showtime.', 'danger')
+            return redirect(url_for('movie.movie_detail', movie_id=movie_id))
+        total_price = len(selected_seats) * movie.ticket_price
+        return render_template('payment.html', movie=movie, user=current_user,
+                             selected_seats=selected_seats, showtime=showtime, total_price=total_price)
+    return redirect(url_for('movie.movie_detail', movie_id=movie_id))
 
-@bp.route('/edit_movie/<int:movie_id>', methods=['GET', 'POST'])
+@bp.route('/edit_movie/<int:movie_id>', methods=['GET', 'POST'], endpoint='edit_movie')
 @login_required
 def edit_movie(movie_id):
     if current_user.role != 'admin':
-        flash('Permission denied.', 'error')
-        return redirect(url_for('home'))
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('movie.home'))
     movie = Movie.query.get_or_404(movie_id)
     if request.method == 'POST':
-        movie.title = request.form['title']
-        movie.description = request.form['description']
-        movie.genre = request.form['genre']
-        movie.poster_url = request.form.get('poster_url', '')
+        movie.title = request.form.get('title')
+        movie.description = request.form.get('description')
+        movie.genre = request.form.get('genre')
+        movie.poster_url = request.form.get('poster_url')
         movie.ticket_price = float(request.form.get('ticket_price', 10.00))
-        movie.showtime = request.form.get('showtimes', '')
-        try:
-            db.session.commit()
-            flash('Movie updated successfully!', 'success')
-            return redirect(url_for('movie.view_movies'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error updating movie: {str(e)}', 'error')
-    return render_template('edit_movie.html', movie=movie)
+        movie.showtimes = request.form.get('showtimes')
+        db.session.commit()
+        flash('Movie updated successfully!', 'success')
+        return redirect(url_for('auth.auth_user_dashboard'))
+    return render_template('edit_movie.html', movie=movie, user=current_user)
 
-@bp.route('/showtime/<int:movie_id>', methods=['GET', 'POST'])
+@bp.route('/manage_showtimes/<int:movie_id>', methods=['GET', 'POST'], endpoint='manage_showtimes')
 @login_required
 def manage_showtimes(movie_id):
     if current_user.role != 'admin':
-        flash('Permission denied.', 'error')
-        return redirect(url_for('home'))
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('movie.home'))
     movie = Movie.query.get_or_404(movie_id)
     if request.method == 'POST':
-        showtime = request.form.get('showtimes', '').strip()
-        if showtime:
-            movie.showtime = showtime
-        else:
-            movie.showtime = None
-        try:
-            db.session.commit()
-            flash('Showtime updated successfully!', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error updating showtimes: {str(e)}', 'error')
-        return redirect(url_for('movie.view_movies'))
-    return render_template('showtimes.html', movie=movie)
+        movie.showtimes = request.form.get('showtimes')
+        db.session.commit()
+        flash('Showtimes updated successfully!', 'success')
+        return redirect(url_for('auth.auth_user_dashboard'))
+    return render_template('showtimes.html', movie=movie, user=current_user)
